@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCM YUGA — Employee Feedback Report Q1 & Q2 2025</title>
+<link href="https://api.fontshare.com/v2/css?f[]=clash-grotesk@400,500,600,700&f[]=general-sans@400,500,600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#213643;--gold:#c5960c;--gold-lt:#fef3c7;
+  --white:#fff;--ink:#0f0f0f;--muted:#6b7280;
+  --border:#e5e7eb;--bg:#f9f9f7;--card:#fff;
+  --green:#3B6D11;--green-lt:#97C459;
+  --amber-lt:#EF9F27;--gray:#D3D1C7;
+}
+body{font-family:'General Sans',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4,h5{font-family:'Clash Grotesk',sans-serif;font-weight:500}
+
+.cover-band{background:var(--navy);border-radius:12px;padding:2.5rem;margin-bottom:1.5rem;display:flex;flex-direction:column;gap:1.2rem}
+.cover-eyebrow{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(245,194,0,.6);font-weight:500}
+.cover-title{font-size:clamp(30px,5vw,48px);font-weight:500;color:#fff;line-height:1.05;letter-spacing:-1px}
+.cover-title em{color:#F5C200;font-style:normal}
+.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.1);border-radius:8px;overflow:hidden}
+.kpi{background:rgba(255,255,255,.06);padding:1.1rem 1rem}
+.kpi-val{font-family:'Clash Grotesk',sans-serif;font-size:30px;font-weight:500;color:#F5C200;line-height:1}
+.kpi-val sup{font-size:14px}
+.kpi-lbl{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.4);margin-top:4px}
+
+.nav{position:sticky;top:0;z-index:100;background:rgba(249,249,247,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:0 3rem;display:flex;align-items:center;gap:0}
+.nav-logo{height:30px;width:auto;margin-right:28px;flex-shrink:0}
+.nav-link{padding:13px 14px;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s;background:none;border-top:none;border-left:none;border-right:none;font-family:'General Sans',sans-serif}
+.nav-link:hover{color:var(--ink)}
+.nav-link.active{color:var(--ink);border-bottom-color:var(--gold)}
+
+.wrap{max-width:1040px;margin:0 auto;padding:48px 3rem}
+.eyebrow{font-size:10px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.section-title{font-size:clamp(22px,3vw,30px);color:var(--ink);letter-spacing:-0.5px;margin-bottom:1.5rem}
+.divider{height:1px;background:var(--border);margin:0}
+
+.score-band{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.score-cell{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:.9rem;text-align:center;position:relative;overflow:hidden}
+.score-cell::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent,var(--navy))}
+.score-num{font-family:'Clash Grotesk',sans-serif;font-size:24px;font-weight:500;color:var(--ink);line-height:1;letter-spacing:-1px}
+.score-num sup{font-size:11px;letter-spacing:0}
+.score-sub{font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.8px}
+.score-prog{margin-top:8px;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.score-prog-fill{height:100%;border-radius:2px;background:var(--navy)}
+
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:1.25rem}
+.card-title{font-size:11px;font-weight:600;font-family:'Clash Grotesk',sans-serif;color:var(--muted);margin-bottom:1rem;text-transform:uppercase;letter-spacing:1px}
+.tag-wrap{display:flex;flex-wrap:wrap;gap:7px}
+.tag{padding:5px 13px;border-radius:4px;font-size:12px;font-weight:500;font-family:'Clash Grotesk',sans-serif}
+.tag-pos{background:#EAF3DE;color:#27500A;border:0.5px solid #C0DD97}
+.tag-imp{background:#FAEEDA;color:#633806;border:0.5px solid #FAC775}
+
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px;font-size:12px;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:5px}
+.ld{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+
+footer{background:var(--navy);padding:28px;display:flex;align-items:center;justify-content:center;margin-top:0}
+footer img{height:40px;width:auto;opacity:.85}
+
+@media(max-width:768px){
+  .wrap{padding:36px 20px}
+  .nav{padding:0 20px}
+  .cover-band{padding:1.75rem 1.5rem}
+  .score-band{grid-template-columns:repeat(2,1fr)}
+  .grid-2{grid-template-columns:1fr}
+  .kpi-row{grid-template-columns:repeat(3,1fr)}
+  .cover-title{font-size:30px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" id="top-nav">
+  <div style="font-family:'Clash Grotesk',sans-serif;font-size:13px;font-weight:500;color:var(--ink);margin-right:28px;flex-shrink:0;padding:14px 0;letter-spacing:1px">SCMYUGA</div>
+  <div style="display:flex;overflow-x:auto">
+    <button class="nav-link active" onclick="go('overview')">Overview</button>
+    <button class="nav-link" onclick="go('positives')">What We Got Right</button>
+    <button class="nav-link" onclick="go('improvements')">What Needs Attention</button>
+    <button class="nav-link" onclick="go('detail')">Detailed Ratings</button>
+  </div>
+</nav>
+
+<!-- OVERVIEW -->
+<div id="overview">
+<div class="wrap">
+
+  <div class="cover-band">
+    <div class="cover-eyebrow">Employee Feedback Report · Q1 & Q2 2025</div>
+    <h1 class="cover-title">What Yugans think<br>of <em>SCM YUGA.</em></h1>
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-val">47</div><div class="kpi-lbl">Total responses</div></div>
+      <div class="kpi"><div class="kpi-val">4.8<sup>/5</sup></div><div class="kpi-lbl">Avg recommendation</div></div>
+      <div class="kpi"><div class="kpi-val">96<sup>%</sup></div><div class="kpi-lbl">Would recommend</div></div>
+    </div>
+  </div>
+
+  <div class="eyebrow">At a glance</div>
+  <h2 class="section-title">How people rate the experience</h2>
+
+  <div class="score-band">
+    <div class="score-cell" style="--accent:#16a34a"><div class="score-num">4.8<sup>/5</sup></div><div class="score-sub">Q1 avg</div><div class="score-prog"><div class="score-prog-fill" style="width:96%;background:#16a34a"></div></div></div>
+    <div class="score-cell" style="--accent:#16a34a"><div class="score-num">4.8<sup>/5</sup></div><div class="score-sub">Q2 avg</div><div class="score-prog"><div class="score-prog-fill" style="width:96%;background:#16a34a"></div></div></div>
+    <div class="score-cell"><div class="score-num">92<sup>%</sup></div><div class="score-sub">Feel valued</div><div class="score-prog"><div class="score-prog-fill" style="width:92%"></div></div></div>
+    <div class="score-cell"><div class="score-num">95<sup>%</sup></div><div class="score-sub">HR fair</div><div class="score-prog"><div class="score-prog-fill" style="width:95%"></div></div></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Recommendation score distribution</div>
+      <div class="legend">
+        <span><span class="ld" style="background:#213643"></span>Score 5 — 67%</span>
+        <span><span class="ld" style="background:#c5960c"></span>Score 4 — 29%</span>
+        <span><span class="ld" style="background:#D3D1C7"></span>Score 3 — 4%</span>
+      </div>
+      <div style="position:relative;height:200px"><canvas id="donutNps" role="img" aria-label="Donut chart showing 67% gave score 5, 29% gave score 4, 4% gave score 3">Score 5: 67%, Score 4: 29%, Score 3: 4%</canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Key dimensions — avg score /10</div>
+      <div style="position:relative;height:220px"><canvas id="radarOverall" role="img" aria-label="Radar chart showing all dimensions above 8 out of 10">All dimensions score above 8/10</canvas></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- POSITIVES -->
+<div id="positives">
+<div class="wrap">
+  <div class="eyebrow">What we got right</div>
+  <h2 class="section-title">Top themes people love</h2>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Most mentioned positive themes</div>
+      <div style="position:relative"><canvas id="posBar" role="img" aria-label="Horizontal bar chart of positive themes. Work culture tops the list.">Work culture: 42, Team support: 38, Learning and growth: 35, Flexibility: 29, Family feeling: 22, Ownership: 18</canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Manager attributes — % positive</div>
+      <div style="position:relative;height:220px"><canvas id="mgrBar" role="img" aria-label="Bar chart of manager attributes, all above 80 percent positive">All manager attributes above 80% positive</canvas></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-title">All positive themes — both quarters</div>
+    <div class="tag-wrap">
+      <span class="tag tag-pos">Work culture</span>
+      <span class="tag tag-pos">Team support</span>
+      <span class="tag tag-pos">Learning & growth</span>
+      <span class="tag tag-pos">Flexibility</span>
+      <span class="tag tag-pos">Family feeling</span>
+      <span class="tag tag-pos">Ownership & autonomy</span>
+      <span class="tag tag-pos">Collaborative environment</span>
+      <span class="tag tag-pos">Work-life balance</span>
+      <span class="tag tag-pos">Leadership accessibility</span>
+      <span class="tag tag-pos">Open feedback culture</span>
+      <span class="tag tag-pos">Non-toxic environment</span>
+      <span class="tag tag-pos">Continuous improvement</span>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- IMPROVEMENTS -->
+<div id="improvements">
+<div class="wrap">
+  <div class="eyebrow">What needs attention</div>
+  <h2 class="section-title">Areas raised across both quarters</h2>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Frequency of improvement themes</div>
+      <div style="position:relative"><canvas id="impBar" role="img" aria-label="Horizontal bar chart of improvement areas. Employee engagement is most requested.">Employee engagement most requested, followed by communication and compensation</canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Q1 vs Q2 — improvement themes</div>
+      <div style="position:relative;height:260px">
+        <div class="legend" style="margin-bottom:6px">
+          <span><span class="ld" style="background:#213643"></span>Q1 2025</span>
+          <span><span class="ld" style="background:#c5960c"></span>Q2 2025</span>
+        </div>
+        <canvas id="qtrComp" role="img" aria-label="Grouped bar chart comparing Q1 and Q2 improvement themes">Both quarters show similar improvement themes</canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-title">All improvement themes — both quarters</div>
+    <div class="tag-wrap">
+      <span class="tag tag-imp">Employee engagement</span>
+      <span class="tag tag-imp">Communication & transparency</span>
+      <span class="tag tag-imp">Compensation clarity</span>
+      <span class="tag tag-imp">More in-house projects</span>
+      <span class="tag tag-imp">Learning & upskilling</span>
+      <span class="tag tag-imp">Leadership connects</span>
+      <span class="tag tag-imp">Skip-level conversations</span>
+      <span class="tag tag-imp">Internal KT sessions</span>
+      <span class="tag tag-imp">Goal clarity</span>
+      <span class="tag tag-imp">SAP Public Cloud / AI training</span>
+      <span class="tag tag-imp">Sales vertical setup</span>
+      <span class="tag tag-imp">Project management clarity</span>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- DETAILED RATINGS -->
+<div id="detail">
+<div class="wrap">
+  <div class="eyebrow">Detailed ratings</div>
+  <h2 class="section-title">How each dimension scores</h2>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Manager effectiveness — % agree or strongly agree</div>
+      <div style="position:relative"><canvas id="mgrDetail" role="img" aria-label="Horizontal bar of manager effectiveness metrics, all above 80 percent">All above 80%</canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Workplace experience — % agree or strongly agree</div>
+      <div style="position:relative"><canvas id="workDetail" role="img" aria-label="Horizontal bar of workplace experience scores">All strong scores</canvas></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<footer>
+  <div style="color:rgba(245,194,0,.7);font-family:'Clash Grotesk',sans-serif;font-size:15px;font-weight:500;letter-spacing:2px">SCMYUGA</div>
+</footer>
+
+<script>
+Chart.defaults.font.family = "'General Sans', system-ui, sans-serif";
+const textCol = '#9ca3af';
+const gridCol = 'rgba(0,0,0,0.06)';
+const navy = '#213643';
+const gold = '#c5960c';
+const greenLt = '#97C459';
+const amberLt = '#EF9F27';
+const grayCol = '#D3D1C7';
+
+function hBar(id, labels, data, colors) {
+  const wrap = document.getElementById(id).parentElement;
+  wrap.style.height = (labels.length * 38 + 44) + 'px';
+  new Chart(document.getElementById(id), {
+    type: 'bar',
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderRadius: 3, borderSkipped: false }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      indexAxis: 'y',
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.parsed.x } } },
+      scales: {
+        x: { grid: { color: gridCol }, border: { display: false }, ticks: { color: textCol, font: { size: 11 } } },
+        y: { grid: { display: false }, border: { display: false }, ticks: { color: '#374151', font: { size: 11 } } }
+      }
+    }
+  });
+}
+
+function pctBar(id, labels, data, color) {
+  const wrap = document.getElementById(id).parentElement;
+  wrap.style.height = (labels.length * 38 + 44) + 'px';
+  new Chart(document.getElementById(id), {
+    type: 'bar',
+    data: { labels, datasets: [{ data, backgroundColor: color, borderRadius: 3, borderSkipped: false }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      indexAxis: 'y',
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.parsed.x + '%' } } },
+      scales: {
+        x: { max: 100, grid: { color: gridCol }, border: { display: false }, ticks: { color: textCol, font: { size: 11 }, callback: v => v + '%' } },
+        y: { grid: { display: false }, border: { display: false }, ticks: { color: '#374151', font: { size: 11 } } }
+      }
+    }
+  });
+}
+
+new Chart(document.getElementById('donutNps'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Score 5 (67%)', 'Score 4 (29%)', 'Score 3 (4%)'],
+    datasets: [{ data: [32, 14, 1], backgroundColor: [navy, gold, grayCol], borderWidth: 0, hoverOffset: 4 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, cutout: '68%',
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ' ' + Math.round(ctx.parsed / 47 * 100) + '%' } }
+    }
+  }
+});
+
+new Chart(document.getElementById('radarOverall'), {
+  type: 'radar',
+  data: {
+    labels: ['Work culture', 'Team support', 'Manager support', 'Leadership', 'HR transparency', 'Work-life balance', 'Growth path', 'Belonging'],
+    datasets: [{
+      data: [9.2, 8.9, 8.8, 8.4, 8.6, 8.1, 8.0, 8.5],
+      backgroundColor: 'rgba(33,54,67,0.10)',
+      borderColor: navy, borderWidth: 2,
+      pointBackgroundColor: gold, pointBorderColor: navy, pointRadius: 4
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      r: {
+        min: 0, max: 10, ticks: { stepSize: 2, font: { size: 10 }, color: textCol, backdropColor: 'transparent' },
+        pointLabels: { font: { size: 10 }, color: '#374151' },
+        grid: { color: gridCol }, angleLines: { color: gridCol }
+      }
+    }
+  }
+});
+
+hBar('posBar',
+  ['Work culture', 'Team support', 'Learning & growth', 'Flexibility', 'Family feeling', 'Ownership'],
+  [42, 38, 35, 29, 22, 18],
+  [navy, navy, navy, gold, gold, gold]
+);
+
+new Chart(document.getElementById('mgrBar'), {
+  type: 'bar',
+  data: {
+    labels: ['Communicates clearly', 'Supports growth', 'Timely feedback', 'Approachable', 'Recognises achievements'],
+    datasets: [{ data: [91, 89, 86, 94, 83], backgroundColor: navy, borderRadius: 4 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.parsed.y + '%' } } },
+    scales: {
+      y: { max: 100, grid: { color: gridCol }, border: { display: false }, ticks: { color: textCol, font: { size: 10 }, callback: v => v + '%' } },
+      x: { grid: { display: false }, border: { display: false }, ticks: { color: '#374151', font: { size: 10 } } }
+    }
+  }
+});
+
+hBar('impBar',
+  ['Employee engagement', 'Communication', 'Compensation clarity', 'In-house projects', 'Learning & upskilling', 'Leadership connects'],
+  [38, 31, 24, 22, 18, 14],
+  [amberLt, amberLt, amberLt, amberLt, amberLt, amberLt]
+);
+
+new Chart(document.getElementById('qtrComp'), {
+  type: 'bar',
+  data: {
+    labels: ['Engagement', 'Communication', 'Compensation', 'Projects', 'Learning'],
+    datasets: [
+      { label: 'Q1 2025', data: [18, 14, 10, 9, 7], backgroundColor: navy, borderRadius: 3 },
+      { label: 'Q2 2025', data: [20, 17, 14, 13, 11], backgroundColor: gold, borderRadius: 3 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, border: { display: false }, ticks: { color: '#374151', font: { size: 10 } } },
+      y: { grid: { color: gridCol }, border: { display: false }, ticks: { color: textCol, font: { size: 10 } } }
+    }
+  }
+});
+
+pctBar('mgrDetail',
+  ['Communicates clearly', 'Supports growth', 'Timely feedback', 'Approachable', 'Recognises achievements'],
+  [91, 89, 86, 94, 83],
+  [navy, navy, navy, navy, navy]
+);
+
+pctBar('workDetail',
+  ['Feel respected & valued', 'Sense of belonging', 'Work-life balance', 'Safe to give feedback', 'Growth path clarity'],
+  [88, 85, 82, 84, 80],
+  [greenLt, greenLt, greenLt, greenLt, greenLt]
+);
+
+const sections = ['overview','positives','improvements','detail'];
+const links = document.querySelectorAll('.nav-link');
+window.addEventListener('scroll',()=>{
+  let cur = 'overview';
+  sections.forEach(id=>{
+    const el = document.getElementById(id);
+    if(el && window.scrollY >= el.offsetTop - 120) cur = id;
+  });
+  links.forEach((l,i)=>l.classList.toggle('active', sections[i]===cur));
+});
+
+function go(id){ document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'}); }
+</script>
+</body>
+</html>
